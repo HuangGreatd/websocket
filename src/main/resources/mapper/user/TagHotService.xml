@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.juzipi.mapper.TagHotMapper">
+
+
+    <resultMap id="BaseResultMap" type="com.juzipi.domain.entity.TagHot">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
+        <result property="count" column="count" jdbcType="INTEGER"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="isHasTag" resultType="int">
+        select case when count(*) > 0 then id else -1 end
+        from tag_hot
+        where LOWER(tag_name) = LOWER(#{tag_name})
+    </select>
+
+    <update id="updateTagCount" >
+        update tag_hot
+        set count = count + 1,version = version  + 1
+        where id = #{tagId} and version = #{version}
+    </update>
+
+    <select id="getTagByName" resultType="com.juzipi.domain.entity.TagHot">
+        select * from tag_hot
+        where LOWER(tag_name) = LOWER(#{tag_name})
+    </select>
+
+    <select id="selectByTagNames" resultType="com.juzipi.domain.entity.TagHot">
+        select  tag_name
+        from tag_hot
+        order by `count` DESC limit 0,10
+    </select>
+</mapper>

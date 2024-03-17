@@ -28,9 +28,27 @@
         where LOWER(tag_name) = LOWER(#{tag_name})
     </select>
 
-    <select id="selectByTagNames" resultType="com.juzipi.domain.entity.TagHot">
+    <select id="selectByTagNames" resultType="string">
         select  tag_name
         from tag_hot
         order by `count` DESC limit 0,10
+    </select>
+
+    <select id="selectCountOrderByDesc" resultType="integer">
+        select  `count`
+        from tag_hot
+        order by `count` DESC limit 0,10
+    </select>
+
+    <select id="selectTagNameAndCountByCreateTime" resultType="com.juzipi.domain.entity.TagHot">
+        SELECT *
+        FROM tag_hot
+        <where>
+            <if test="createTime != null">
+                AND DATE(create_time) = DATE(STR_TO_DATE(#{createTime,jdbcType=VARCHAR}, '%Y-%m-%d '))
+            </if>
+        </where>
+        ORDER BY `count` DESC
+        LIMIT 0,10
     </select>
 </mapper>

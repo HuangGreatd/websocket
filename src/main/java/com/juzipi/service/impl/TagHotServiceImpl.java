@@ -5,6 +5,7 @@ import com.juzipi.common.ErrorCode;
 import com.juzipi.domain.entity.TagHot;
 import com.juzipi.domain.req.WatchHotTagsRequest;
 import com.juzipi.domain.vo.ChartData;
+import com.juzipi.domain.vo.SeriesData;
 import com.juzipi.exception.BusinessException;
 import com.juzipi.mapper.TagHotMapper;
 import com.juzipi.service.TagHotService;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Juzipi
@@ -48,9 +51,9 @@ public class TagHotServiceImpl extends ServiceImpl<TagHotMapper, TagHot> impleme
                 }
             } else {
                 TagHot newTagHot = new TagHot();
-                tagHot.setTagName(tagName);
+                newTagHot.setTagName(tagName);
                 // 新纪录的初始版本号设置为 1
-                tagHot.setVersion(1);
+                newTagHot.setVersion(1);
                 this.save(newTagHot);
             }
         }
@@ -59,10 +62,17 @@ public class TagHotServiceImpl extends ServiceImpl<TagHotMapper, TagHot> impleme
     @Override
     public ChartData watchHotTags(WatchHotTagsRequest watchHotTagsRequest) {
         ChartData chartData = new ChartData();
-        if (watchHotTagsRequest.getTime() != null){
-            List<String> tagNames = tagHotMapper.selectByTagNames();
-            chartData.setYAxisData(tagNames);
-        }
-        return null;
+        List<TagHot> tagHotList = tagHotMapper.selectTagNameAndCountByCreateTime(watchHotTagsRequest.getTime());
+        List<String> tagNames = tagHotList.stream().map(tagHot -> tagHot.getTagName()).collect(Collectors.toList());
+        chartData.setYAxisData(tagNames);
+        SeriesData seriesData = new SeriesData();
+        //todo 后期可以修改成自定义灵活条数
+        List<Integer> tagCount = tagHotList.stream().map(tagHot -> tagHot.getCount()).collect(Collectors.toList());
+        System.out.println(tagCount);
+        seriesData.setData(tagCount);
+        List<SeriesData> seriesDataList = new ArrayList<>();
+        seriesDataList.add(seriesData);
+        chartData.setSeriesData(seriesDataList);
+        return chartData;
     }
 }

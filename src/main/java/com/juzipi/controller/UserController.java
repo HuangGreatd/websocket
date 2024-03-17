@@ -212,6 +212,10 @@ public class UserController {
     @ApiImplicitParams(
             {@ApiImplicitParam(name = "tagNameList", value = "标签列表")})
     public BaseResponse<ChartData> watchHotTags(@RequestBody  WatchHotTagsRequest watchHotTagsRequest, HttpServletRequest request){
+        User loginUser = userService.getLoginUser(request);
+        if (loginUser== null){
+            throw new BusinessException(ErrorCode.NOT_LOGIN,"未登录");
+        }
         ChartData chartData = tagHotService.watchHotTags(watchHotTagsRequest);
         return ResultUtis.success(chartData);
     }

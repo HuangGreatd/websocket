@@ -24,4 +24,8 @@ public interface TagHotMapper extends BaseMapper<TagHot> {
     TagHot getTagByName(String tag);
 
     List<String> selectByTagNames();
+
+    List<Integer> selectCountOrderByDesc();
+
+    List<TagHot> selectTagNameAndCountByCreateTime(String createTime);
 }
